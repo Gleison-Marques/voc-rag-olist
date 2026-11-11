@@ -1,0 +1,19 @@
+[
+  {"q": "Quais são os principais problemas relatados pelos clientes em suas avaliações?", "expect": "ok", "themes": ["entrega_atraso", "nao_recebido", "qualidade_produto", "produto_divergente", "troca_reembolso", "atendimento"]},
+  {"q": "O que os clientes relatam sobre problemas relacionados à entrega?", "expect": "ok", "themes": ["entrega_atraso", "nao_recebido"]},
+  {"q": "Quais aspectos da experiência de compra são mais elogiados pelos clientes?", "expect": "ok", "themes": ["satisfacao", "entrega_rapida", "qualidade_produto"]},
+  {"q": "Quais padrões podem ser identificados nas avaliações de clientes insatisfeitos?", "expect": "ok", "themes": ["entrega_atraso", "nao_recebido", "qualidade_produto", "produto_divergente", "troca_reembolso", "atendimento"]},
+  {"q": "Quais avaliações sustentam a conclusão de que existem problemas recorrentes relacionados ao prazo de entrega?", "expect": "ok", "themes": ["entrega_atraso", "nao_recebido"]},
+  {"q": "Existem padrões recorrentes nas avaliações relacionadas à qualidade dos produtos?", "expect": "ok", "themes": ["qualidade_produto"]},
+  {"q": "Quais são os principais problemas relatados nas avaliações com nota baixa?", "expect": "ok", "themes": ["entrega_atraso", "nao_recebido", "qualidade_produto", "produto_divergente", "troca_reembolso", "atendimento"]},
+  {"q": "O que os clientes mais elogiam em produtos de beleza e saúde?", "expect": "ok", "themes": ["satisfacao", "entrega_rapida", "qualidade_produto"]},
+  {"q": "Quais temas aparecem nas avaliações de pedidos entregues com atraso?", "expect": "ok", "themes": ["entrega_atraso", "nao_recebido"]},
+  {"q": "Como os clientes avaliam o atendimento e a comunicação do vendedor?", "expect": "ok", "themes": ["atendimento"]},
+  {"q": "O que os clientes dizem sobre troca e devolução de produtos?", "expect": "ok", "themes": ["troca_reembolso"]},
+  {"q": "Qual é a capital da França?", "expect": "refuse"},
+  {"q": "Qual a opinião dos clientes sobre a cotação do bitcoin?", "expect": "refuse"},
+  {"q": "O que os clientes acham do aplicativo de realidade virtual da loja?", "expect": "refuse"},
+  {"q": "Quais reclamações existem sobre o programa de cashback com criptomoedas?", "expect": "refuse"},
+  {"q": "Como foi a experiência dos clientes que compraram passagens aéreas?", "expect": "refuse"},
+  {"q": "Quais os problemas relatados em avaliações de 2015?", "expect": "refuse"}
+]
