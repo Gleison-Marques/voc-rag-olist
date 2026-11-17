@@ -1,4 +1,3 @@
-"""Índices de recuperação: lexical (TF-IDF) e semântico (embeddings + FAISS)."""
 from __future__ import annotations
 
 import json
@@ -14,7 +13,6 @@ from .config import settings
 from .text import STOPWORDS
 
 
-# --------------------------------------------------------------------------- lexical
 class TfidfIndex:
     name = "tfidf"
 
@@ -60,12 +58,11 @@ class TfidfIndex:
         return (d / "tfidf_matrix.npz").exists()
 
 
-# --------------------------------------------------------------------------- semântico
 class Embedder:
     """Embeddings multilíngues via fastembed (ONNX, roda em CPU, sem PyTorch)."""
 
     def __init__(self, model_name: str):
-        from fastembed import TextEmbedding  # import tardio: dependência opcional
+        from fastembed import TextEmbedding
 
         self.model_name = model_name
         self.is_e5 = "e5" in model_name.lower()

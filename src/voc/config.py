@@ -1,4 +1,3 @@
-"""Configuração central do projeto (lida de variáveis de ambiente / .env)."""
 from __future__ import annotations
 
 import os
@@ -7,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-try:  # .env é opcional
+try:
     from dotenv import load_dotenv
 
     load_dotenv(ROOT / ".env")
@@ -25,11 +24,9 @@ class Settings:
     processed_dir: Path = ROOT / "data" / "processed"
     index_dir: Path = ROOT / "data" / "index"
 
-    # ---- Base de conhecimento
     min_chars: int = int(_env("VOC_MIN_CHARS", "10"))
     min_words: int = int(_env("VOC_MIN_WORDS", "2"))
 
-    # ---- Recuperação
     # backend: "hybrid" (denso + lexical, RRF), "dense" ou "tfidf"
     backend: str = _env("VOC_BACKEND", "hybrid")
     embedding_model: str = _env(
@@ -39,13 +36,11 @@ class Settings:
     top_k: int = int(_env("VOC_TOP_K", "12"))  # avaliações enviadas ao LLM
     rrf_k: int = 60
 
-    # ---- Guardrails (calibre com scripts/evaluate.py)
     min_evidence: int = int(_env("VOC_MIN_EVIDENCE", "3"))
     tfidf_min_score: float = float(_env("VOC_TFIDF_MIN_SCORE", "0.12"))
     dense_min_score: float = float(_env("VOC_DENSE_MIN_SCORE", "0.45"))
     min_coverage: float = float(_env("VOC_MIN_COVERAGE", "0.6"))  # termos de assunto cobertos
 
-    # ---- Geração
     # provider: "anthropic", "openai" (qualquer API compatível: OpenAI, Ollama, Groq...) ou "extractive"
     llm_provider: str = _env("VOC_LLM_PROVIDER", "auto")
     llm_model: str = _env("VOC_LLM_MODEL", "")

@@ -1,4 +1,3 @@
-"""Processamento da pergunta: intenção, filtros de metadados e expansão de consulta."""
 from __future__ import annotations
 
 import re
@@ -111,14 +110,14 @@ def plan_query(question: str, known_categories: list[str], use_intent_filter: bo
     f = fold(question)
     p = QueryPlan(question=question, folded=f)
 
-    # 1) Intenção (sentimento buscado)
+    # intenção (sentimento buscado)
     neg, pos = bool(NEG_RX.search(f)), bool(POS_RX.search(f))
     if neg and not pos:
         p.intent = "negativa"
     elif pos and not neg:
         p.intent = "positiva"
 
-    # 2) Nota explícita > nota implícita pela intenção
+    # nota explícita > nota implícita pela intenção
     m = re.search(r"notas? (\d)(?:\s*(?:a|e|ou|-)\s*(\d))?", f)
     if m:
         a = int(m.group(1)); b = int(m.group(2) or a)
@@ -135,7 +134,7 @@ def plan_query(question: str, known_categories: list[str], use_intent_filter: bo
         p.score_range = (4, 5)
         p.notes.append("intenção positiva → considerando notas 4–5")
 
-    # 3) Categoria (nome da categoria ou alias)
+    # categoria (nome da categoria ou alias)
     cats: list[str] = []
     cat_terms: set[str] = set()
     words = set(re.findall(r"[a-z]{2,}", f))
@@ -153,17 +152,17 @@ def plan_query(question: str, known_categories: list[str], use_intent_filter: bo
                 cat_terms.add(term)
     p.categories = sorted({c for c in cats if c in known_categories})
 
-    # 4) Período e atraso
+    # período e atraso
     p.years = sorted({int(y) for y in re.findall(r"\b(20\d\d)\b", f)})
     if re.search(r"(pedidos|entregas|compras) (entregues )?(com )?atras|entregues? (com )?atras", f):
         p.delivered_late = True
 
-    # 5) Overrides vindos da interface (filtros escolhidos pelo usuário)
+    # overrides vindos da interface (filtros escolhidos pelo usuário)
     for k, v in (overrides or {}).items():
         if v is not None and hasattr(p, k):
             setattr(p, k, v)
 
-    # 6) Expansão lexical + temas em foco
+    # expansão lexical + temas em foco
     extra = [exp for rx, exp in EXPANSIONS.items() if re.search(rx, f)]
     p.lexical_query = " ".join([" ".join(content_terms(question))] + extra)
     p.focus_themes = [k for k, t in THEMES.items() if re.search(t["pattern"], f)]

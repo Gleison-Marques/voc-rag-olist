@@ -1,4 +1,3 @@
-"""Normalização de texto, stopwords e taxonomia de temas da Voz do Cliente."""
 from __future__ import annotations
 
 import re

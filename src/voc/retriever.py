@@ -1,4 +1,3 @@
-"""Recuperação híbrida com filtros de metadados, fusão RRF e remoção de redundância."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -16,7 +15,6 @@ NEG_THEMES = {"entrega_atraso", "nao_recebido", "produto_divergente", "troca_ree
 
 
 def rerank_factor(themes: list[str], n_words: int, p: QueryPlan) -> float:
-    """Ajuste leve sobre a fusão: alinhamento de tema e de polaridade com a pergunta."""
     f, ts = 1.0, set(themes)
     if p.target_themes and ts & set(p.target_themes):
         f *= 1.3
@@ -84,7 +82,6 @@ class Retriever:
             print("[aviso] índice denso não encontrado — usando somente TF-IDF.")
         return cls(docs, tf, de)
 
-    # ------------------------------------------------------------------ filtros
     def mask_for(self, p: QueryPlan) -> np.ndarray:
         d = self.docs
         m = np.ones(len(d), dtype=bool)
@@ -98,7 +95,6 @@ class Retriever:
             m &= (d["delivered_late"] == float(p.delivered_late)).to_numpy()
         return m
 
-    # ------------------------------------------------------------------ estatísticas do recorte
     def slice_stats(self, mask: np.ndarray) -> dict:
         n = int(mask.sum())
         if n == 0:
@@ -116,7 +112,6 @@ class Retriever:
             "top_categorias": sub["category"].value_counts().head(5).to_dict(),
         }
 
-    # ------------------------------------------------------------------ busca
     def retrieve(self, p: QueryPlan, top_k: int | None = None) -> Retrieval:
         """Pergunta com assunto específico -> busca híbrida direta.
         Pergunta panorâmica ("principais problemas", "o que mais elogiam") -> busca estratificada

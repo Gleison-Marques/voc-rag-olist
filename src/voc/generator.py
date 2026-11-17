@@ -1,4 +1,3 @@
-"""Geração da resposta: LLM (Anthropic / API compatível com OpenAI) ou modo extrativo offline."""
 from __future__ import annotations
 
 import json
@@ -66,8 +65,6 @@ class AnthropicGenerator(BaseGenerator):
 
 
 class OpenAICompatibleGenerator(BaseGenerator):
-    """OpenAI, Ollama (VOC_LLM_BASE_URL=http://localhost:11434/v1), Groq, Azure etc."""
-
     name = "openai"
 
     def __init__(self, model: str | None = None, base_url: str | None = None):
@@ -91,9 +88,6 @@ class OpenAICompatibleGenerator(BaseGenerator):
 
 
 class ExtractiveGenerator(BaseGenerator):
-    """Sem LLM: agrupa as evidências por tema e cita trechos literais. Útil como baseline,
-    para rodar sem chave de API e para testes determinísticos."""
-
     name = "extractive"
 
     def generate(self, question, evidences, stats, filters):

@@ -1,4 +1,3 @@
-"""Orquestração do RAG: pergunta → plano → recuperação → guardrails → geração → validação."""
 from __future__ import annotations
 
 import re
@@ -15,14 +14,9 @@ CITATION_RX = re.compile(r"\[(R\d+)\]")
 
 
 def term_coverage(key_terms: list[str], evidences: list[Evidence]) -> tuple[float, list[str], int]:
-    """Checagem de suporte textual (anti-alucinação).
-
-    - cobertura: fração dos termos de assunto da pergunta presentes em ALGUMA evidência;
-    - suporte: nº de evidências que, SOZINHAS, contêm ao menos metade dos termos de assunto.
-      Evita aceitar "aplicativo de realidade virtual" só porque "virtual" aparece em
-      "loja virtual" numa avaliação e "realidade" em outra.
-    Usa radical de 5 letras sobre texto sem acento.
-    """
+    # cobertura = termos da pergunta achados em alguma evidência
+    # suporte = evidências que sozinhas têm pelo menos metade dos termos
+    # (evita aceitar "realidade virtual" só porque as duas palavras aparecem em avaliações diferentes)
     if not key_terms:
         return 1.0, [], len(evidences)
     stems = [t[:5] for t in key_terms]
@@ -82,7 +76,6 @@ class VoCRAG:
                     plan_notes=p.notes, n_filtered=r.n_filtered, n_relevant=len(relevant),
                     stats=r.stats, generator=self.generator.name, backends=r.backends)
 
-        # ---------------- Guardrails ANTES da geração (não gasta LLM e não deixa alucinar)
         if r.n_filtered == 0:
             return Answer(status="sem_dados_no_filtro", answer=(
                 "Não há avaliações com texto que atendam aos filtros identificados "
@@ -110,7 +103,6 @@ class VoCRAG:
                 "conclusão confiável; as avaliações mais próximas estão listadas abaixo para consulta."),
                 **{**base, "evidences": r.evidences[:5]})
 
-        # ---------------- Geração apenas com evidências relevantes
         warnings: list[str] = []
         try:
             text = self.generator.generate(question, relevant, r.stats, p.filters_description())
@@ -124,7 +116,6 @@ class VoCRAG:
                           answer=text.replace(INSUFFICIENT_TOKEN, "").strip(), warnings=warnings,
                           **{**base, "evidences": relevant})
 
-        # ---------------- Validação DEPOIS da geração (rastreabilidade)
         valid = {e.ref for e in relevant}
         cited = list(dict.fromkeys(CITATION_RX.findall(text)))
         invalid = [c for c in cited if c not in valid]

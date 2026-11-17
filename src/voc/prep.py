@@ -1,4 +1,3 @@
-"""Construção da base de conhecimento: seleção, limpeza, metadados e documentos."""
 from __future__ import annotations
 
 import json
@@ -58,7 +57,7 @@ def build_documents(raw: dict, verbose: bool = True) -> tuple[pd.DataFrame, dict
     rv = raw["reviews"].copy()
     stats["reviews_total"] = len(rv)
 
-    # 1) Limpeza dos campos textuais (título + mensagem)
+    # limpeza dos campos textuais (título + mensagem)
     rv["title"] = rv["review_comment_title"].map(clean_text)
     rv["message"] = rv["review_comment_message"].map(clean_text)
     stats["sem_mensagem"] = int((rv["message"] == "").sum())
@@ -71,20 +70,20 @@ def build_documents(raw: dict, verbose: bool = True) -> tuple[pd.DataFrame, dict
 
     rv["text"] = [_join(t, m) for t, m in zip(rv["title"], rv["message"])]
 
-    # 2) Seleção: só avaliações com conteúdo textual informativo
+    # seleção: só avaliações com conteúdo textual informativo
     n_words = rv["text"].str.split().str.len().fillna(0)
     keep = (rv["text"].str.len() >= settings.min_chars) & (n_words >= settings.min_words)
     stats["descartadas_texto_curto_ou_vazio"] = int((~keep).sum())
     rv = rv[keep].copy()
 
-    # 3) Duplicatas: mesmo review_id ou mesmo texto no mesmo pedido
+    # duplicatas: mesmo review_id ou mesmo texto no mesmo pedido
     before = len(rv)
     rv = rv.drop_duplicates("review_id")
     rv["_k"] = rv["text"].map(fold)
     rv = rv.drop_duplicates(["order_id", "_k"]).drop(columns="_k")
     stats["duplicatas_removidas"] = before - len(rv)
 
-    # 4) Metadados do pedido (entrega)
+    # metadados do pedido (entrega)
     od = raw["orders"].copy()
     for c in [
         "order_purchase_timestamp",
@@ -112,7 +111,7 @@ def build_documents(raw: dict, verbose: bool = True) -> tuple[pd.DataFrame, dict
         ]
     ]
 
-    # 5) Categoria do produto (pedido com vários itens: categoria mais frequente; empate -> 1º item)
+    # categoria do produto (pedido com vários itens: categoria mais frequente; empate -> 1º item)
     it = raw["items"][["order_id", "order_item_id", "product_id", "price", "freight_value"]]
     pr = raw["products"][["product_id", "product_category_name"]]
     it = it.merge(pr, on="product_id", how="left")
@@ -134,7 +133,7 @@ def build_documents(raw: dict, verbose: bool = True) -> tuple[pd.DataFrame, dict
     df["category_en"] = df["category_en"].fillna("unknown")
     df["order_status"] = df["order_status"].fillna("desconhecido")
 
-    # 6) Campos derivados
+    # campos derivados
     df["review_date"] = _parse_dt(df["review_creation_date"])
     df["year_month"] = df["review_date"].dt.strftime("%Y-%m")
     df["year"] = df["review_date"].dt.year.astype("Int64")
